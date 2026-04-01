@@ -1,9 +1,10 @@
-// Step 1: サイトマップURLだけを返す（高速・1-2秒）
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   try {
     const r = await fetch('https://pickleballtournaments.com/tournaments-sitemap.xml', {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     });
+    if (!r.ok) throw new Error('sitemap fetch failed: ' + r.status);
     const xml = await r.text();
     const urls = [...xml.matchAll(/<loc>(https:\/\/pickleballtournaments\.com\/tournaments\/[^<]+)<\/loc>/g)]
       .map(m => m[1])
