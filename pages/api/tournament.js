@@ -1,8 +1,7 @@
-// Step 2: 1件の大会詳細を返す（高速・1秒以内）
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'url required' });
-
   try {
     const r = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0', 'RSC': '1' },
@@ -19,7 +18,8 @@ export default async function handler(req, res) {
     if (endDate && new Date(endDate) < new Date()) return res.status(200).json({ _past: true });
 
     const startDate = text.match(/"startDate":"(\d{4}-\d{2}-\d{2})"/)?.[1] || null;
-    const name = (text.match(/content="([^"]+)" property="og:title"/)?.[1] || text.match(/<title>([^<]+)<\/title>/)?.[1] || url.split('/tournaments/')[1]).replace(' | PickleballTournaments.com','').trim();
+    const nameMatch = text.match(/property="og:title" content="([^"]+)"/) || text.match(/content="([^"]+)" property="og:title"/);
+    const name = (nameMatch?.[1] || url.split('/tournaments/')[1]).replace(' | PickleballTournaments.com', '').trim();
     const cost = text.match(/"currentRegPrice":"([^"]+)"/)?.[1] || '';
     const venueName = text.match(/"venueName":"([^"]+)"/)?.[1] || '';
     const cityStateZip = text.match(/"cityStateZip":"([^"]+)"/)?.[1] || '';
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       hasGoldenTicket, prizeInfo, hasPrizeMoney,
       eventNames, playerCount,
     });
-  } catch {
+  } catch (e) {
     res.status(200).json(null);
   }
 }
