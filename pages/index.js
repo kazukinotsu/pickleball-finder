@@ -145,7 +145,7 @@ export default function Home() {
 
     try {
       // Step 0: ZIP → lat/lon
-      const geoRes = await fetch(`/api/geocode?zip=${zip}`, { signal: controller.signal });
+      const geoRes = await fetch(`/api/geocode?zip=${encodeURIComponent(zip)}`, { signal: controller.signal });
       const geo = await geoRes.json();
       if (!geoRes.ok) throw new Error(geo.error);
       const { lat, lon } = geo;
